@@ -1,0 +1,2 @@
+#pragma code_page(65001)
+1 /* CREATEPROCESS_MANIFEST_RESOURCE_ID */ 24 /* RT_MANIFEST */ "C:/Users/shford/CLionProjects/hello_cuda/cmake-build-debug/CMakeFiles/hello_cuda.dir/embed.manifest"
