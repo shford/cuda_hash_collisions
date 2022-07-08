@@ -2,7 +2,6 @@
  * Constants for the RTX 3060-Ti obtained from Device Query (sample program)
  */
 
-
 #ifndef HELLO_CUDA_CUDA_CONSTS_CUH
 #define HELLO_CUDA_CUDA_CONSTS_CUH
 

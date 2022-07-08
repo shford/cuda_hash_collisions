@@ -15,6 +15,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <cuda_runtime_api.h>
+#include <cuda.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  TYPES
@@ -87,8 +89,16 @@ Md5Finalise
 //
 //  Combines Md5Initialise, Md5Update, and Md5Finalise into one function. Calculates the MD5 hash of the buffer.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void
-Md5Calculate
+__device__ void
+Md5Calculate_device
+        (
+                void  const*        Buffer,         // [in]
+                uint32_t            BufferSize,     // [in]
+                MD5_HASH*           Digest          // [in]
+        );
+
+__host__ void
+Md5Calculate_host
         (
                 void  const*        Buffer,         // [in]
                 uint32_t            BufferSize,     // [in]

@@ -66,16 +66,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="C:/Users/shford/CLionProjects/hello_cuda/cuda_consts.cuh">
-			<Option target="hello_cuda"/>
-		</Unit>
-		<Unit filename="C:/Users/shford/CLionProjects/hello_cuda/kernel.c">
-			<Option target="hello_cuda"/>
-		</Unit>
-		<Unit filename="C:/Users/shford/CLionProjects/hello_cuda/main.cu">
-			<Option target="hello_cuda"/>
-		</Unit>
-		<Unit filename="C:/Users/shford/CLionProjects/hello_cuda/subroutines.h">
+		<Unit filename="C:/Users/shford/CLionProjects/hello_cuda/cuda_scoping.cu">
 			<Option target="hello_cuda"/>
 		</Unit>
 		<Unit filename="C:/Users/shford/CLionProjects/hello_cuda/CMakeLists.txt">

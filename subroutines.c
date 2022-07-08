@@ -49,7 +49,7 @@ void get_file_data(char file_path[], char** file_buff, long* buff_size) {
 }
 
 // different args since pass by reference is unnecessary
-void write_file_data(char file_path[], char* buff, int buff_size) {
+__device__ void write_file_data(char file_path[], char* buff, int buff_size) {
     FILE* file_handle;
     fopen_s(&file_handle, file_path, "wb");
     if (file_handle == NULL) {
@@ -65,17 +65,4 @@ void write_file_data(char file_path[], char* buff, int buff_size) {
         exit(-1);
     }
 
-}
-
-// increase buffer
-char* resize_buff(char* new_buff, int new_buff_size) {
-    char* tmp_buff = realloc(new_buff, new_buff_size);
-    if (tmp_buff) {
-        return tmp_buff;
-    }
-    else {
-        printf("Failed to reallocate sufficient space for new buff.\n");
-        free(new_buff);
-        exit(-1);
-    }
 }

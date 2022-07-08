@@ -6,9 +6,13 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/shford/CLionProjects/hello_cuda/main.cu
-iostream
+C:/Users/shford/CLionProjects/hello_cuda/cuda_scoping.cu
+cuda_runtime_api.h
 -
-math.h
+cuda.h
+-
+stdio.h
+-
+stdlib.h
 -
 

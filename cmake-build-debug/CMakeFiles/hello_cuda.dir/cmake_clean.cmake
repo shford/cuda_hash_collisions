@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/hello_cuda.dir/cmake_device_link.obj"
-  "CMakeFiles/hello_cuda.dir/main.cu.obj"
+  "CMakeFiles/hello_cuda.dir/cuda_scoping.cu.obj"
   "hello_cuda.exe"
   "hello_cuda.exe.manifest"
   "hello_cuda.lib"

@@ -127,32 +127,32 @@ hello_cuda\fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\build
 .PHONY : hello_cuda\fast
 
-main.obj: main.cu.obj
+cuda_scoping.obj: cuda_scoping.cu.obj
 
-.PHONY : main.obj
+.PHONY : cuda_scoping.obj
 
 # target to build an object file
-main.cu.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\main.cu.obj
-.PHONY : main.cu.obj
+cuda_scoping.cu.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\cuda_scoping.cu.obj
+.PHONY : cuda_scoping.cu.obj
 
-main.i: main.cu.i
+cuda_scoping.i: cuda_scoping.cu.i
 
-.PHONY : main.i
+.PHONY : cuda_scoping.i
 
 # target to preprocess a source file
-main.cu.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\main.cu.i
-.PHONY : main.cu.i
+cuda_scoping.cu.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\cuda_scoping.cu.i
+.PHONY : cuda_scoping.cu.i
 
-main.s: main.cu.s
+cuda_scoping.s: cuda_scoping.cu.s
 
-.PHONY : main.s
+.PHONY : cuda_scoping.s
 
 # target to generate assembly for a file
-main.cu.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\main.cu.s
-.PHONY : main.cu.s
+cuda_scoping.cu.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\cuda_scoping.cu.s
+.PHONY : cuda_scoping.cu.s
 
 # Help Target
 help:
@@ -163,9 +163,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... hello_cuda
-	@echo ... main.obj
-	@echo ... main.i
-	@echo ... main.s
+	@echo ... cuda_scoping.obj
+	@echo ... cuda_scoping.i
+	@echo ... cuda_scoping.s
 .PHONY : help
 
 

@@ -61,27 +61,27 @@ include CMakeFiles\hello_cuda.dir\progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles\hello_cuda.dir\flags.make
 
-CMakeFiles\hello_cuda.dir\main.cu.obj: CMakeFiles\hello_cuda.dir\flags.make
-CMakeFiles\hello_cuda.dir\main.cu.obj: ..\main.cu
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\shford\CLionProjects\hello_cuda\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CUDA object CMakeFiles/hello_cuda.dir/main.cu.obj"
-	C:\PROGRA~1\NVIDIA~2\CUDA\v11.7\bin\nvcc.exe -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -x cu -dc C:\Users\shford\CLionProjects\hello_cuda\main.cu -o CMakeFiles\hello_cuda.dir\main.cu.obj -Xcompiler=-FdCMakeFiles\hello_cuda.dir\,-FS
+CMakeFiles\hello_cuda.dir\cuda_scoping.cu.obj: CMakeFiles\hello_cuda.dir\flags.make
+CMakeFiles\hello_cuda.dir\cuda_scoping.cu.obj: ..\cuda_scoping.cu
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\shford\CLionProjects\hello_cuda\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CUDA object CMakeFiles/hello_cuda.dir/cuda_scoping.cu.obj"
+	C:\PROGRA~1\NVIDIA~2\CUDA\v11.7\bin\nvcc.exe -forward-unknown-to-host-compiler $(CUDA_DEFINES) $(CUDA_INCLUDES) $(CUDA_FLAGS) -x cu -dc C:\Users\shford\CLionProjects\hello_cuda\cuda_scoping.cu -o CMakeFiles\hello_cuda.dir\cuda_scoping.cu.obj -Xcompiler=-FdCMakeFiles\hello_cuda.dir\,-FS
 
-CMakeFiles\hello_cuda.dir\main.cu.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/hello_cuda.dir/main.cu.i"
+CMakeFiles\hello_cuda.dir\cuda_scoping.cu.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CUDA source to CMakeFiles/hello_cuda.dir/cuda_scoping.cu.i"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_PREPROCESSED_SOURCE
 
-CMakeFiles\hello_cuda.dir\main.cu.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CUDA source to assembly CMakeFiles/hello_cuda.dir/main.cu.s"
+CMakeFiles\hello_cuda.dir\cuda_scoping.cu.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CUDA source to assembly CMakeFiles/hello_cuda.dir/cuda_scoping.cu.s"
 	$(CMAKE_COMMAND) -E cmake_unimplemented_variable CMAKE_CUDA_CREATE_ASSEMBLY_SOURCE
 
 # Object files for target hello_cuda
 hello_cuda_OBJECTS = \
-"CMakeFiles\hello_cuda.dir\main.cu.obj"
+"CMakeFiles\hello_cuda.dir\cuda_scoping.cu.obj"
 
 # External object files for target hello_cuda
 hello_cuda_EXTERNAL_OBJECTS =
 
-CMakeFiles\hello_cuda.dir\cmake_device_link.obj: CMakeFiles\hello_cuda.dir\main.cu.obj
+CMakeFiles\hello_cuda.dir\cmake_device_link.obj: CMakeFiles\hello_cuda.dir\cuda_scoping.cu.obj
 CMakeFiles\hello_cuda.dir\cmake_device_link.obj: CMakeFiles\hello_cuda.dir\build.make
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\Users\shford\CLionProjects\hello_cuda\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CUDA device code CMakeFiles\hello_cuda.dir\cmake_device_link.obj"
 	C:\PROGRA~1\NVIDIA~2\CUDA\v11.7\bin\nvcc.exe  -forward-unknown-to-host-compiler -D_WINDOWS -Xcompiler=" /GR /EHsc" -Xcompiler="-Zi -Ob0 -Od /RTC1" -Xcompiler=-MDd -Wno-deprecated-gpu-targets -shared -dlink $(hello_cuda_OBJECTS) $(hello_cuda_EXTERNAL_OBJECTS) -o CMakeFiles\hello_cuda.dir\cmake_device_link.obj  cudadevrt.lib cudart_static.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib  -Xcompiler=-FdC:\Users\shford\CLionProjects\hello_cuda\cmake-build-debug\CMakeFiles\hello_cuda.dir\,-FS
@@ -93,12 +93,12 @@ CMakeFiles\hello_cuda.dir\build: CMakeFiles\hello_cuda.dir\cmake_device_link.obj
 
 # Object files for target hello_cuda
 hello_cuda_OBJECTS = \
-"CMakeFiles\hello_cuda.dir\main.cu.obj"
+"CMakeFiles\hello_cuda.dir\cuda_scoping.cu.obj"
 
 # External object files for target hello_cuda
 hello_cuda_EXTERNAL_OBJECTS =
 
-hello_cuda.exe: CMakeFiles\hello_cuda.dir\main.cu.obj
+hello_cuda.exe: CMakeFiles\hello_cuda.dir\cuda_scoping.cu.obj
 hello_cuda.exe: CMakeFiles\hello_cuda.dir\build.make
 hello_cuda.exe: CMakeFiles\hello_cuda.dir\cmake_device_link.obj
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\Users\shford\CLionProjects\hello_cuda\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CUDA executable hello_cuda.exe"
