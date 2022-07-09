@@ -48,16 +48,16 @@ RM = "C:\Program Files\JetBrains\CLion 2020.3.2\bin\cmake\win\bin\cmake.exe" -E 
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\shford\CLionProjects\hello_cuda
+CMAKE_SOURCE_DIR = C:\Users\shford\CLionProjects\cuda_hashing
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\shford\CLionProjects\hello_cuda\cmake-build-debug
+CMAKE_BINARY_DIR = C:\Users\shford\CLionProjects\cuda_hashing\cmake-build-debug
 
 #=============================================================================
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles\hello_cuda.dir\all
+all: CMakeFiles\cuda_hashing.dir\all
 
 .PHONY : all
 
@@ -67,36 +67,36 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles\hello_cuda.dir\clean
+clean: CMakeFiles\cuda_hashing.dir\clean
 
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/hello_cuda.dir
+# Target rules for target CMakeFiles/cuda_hashing.dir
 
 # All Build rule for target.
-CMakeFiles\hello_cuda.dir\all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\shford\CLionProjects\hello_cuda\cmake-build-debug\CMakeFiles --progress-num=1,2,3 "Built target hello_cuda"
-.PHONY : CMakeFiles\hello_cuda.dir\all
+CMakeFiles\cuda_hashing.dir\all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\cuda_hashing.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\cuda_hashing.dir\depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\cuda_hashing.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\cuda_hashing.dir\build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\shford\CLionProjects\cuda_hashing\cmake-build-debug\CMakeFiles --progress-num=1,2,3 "Built target cuda_hashing"
+.PHONY : CMakeFiles\cuda_hashing.dir\all
 
 # Build rule for subdir invocation for target.
-CMakeFiles\hello_cuda.dir\rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\shford\CLionProjects\hello_cuda\cmake-build-debug\CMakeFiles 3
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\shford\CLionProjects\hello_cuda\cmake-build-debug\CMakeFiles 0
-.PHONY : CMakeFiles\hello_cuda.dir\rule
+CMakeFiles\cuda_hashing.dir\rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\shford\CLionProjects\cuda_hashing\cmake-build-debug\CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) CMakeFiles\cuda_hashing.dir\all
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\shford\CLionProjects\cuda_hashing\cmake-build-debug\CMakeFiles 0
+.PHONY : CMakeFiles\cuda_hashing.dir\rule
 
 # Convenience name for target.
-hello_cuda: CMakeFiles\hello_cuda.dir\rule
+cuda_hashing: CMakeFiles\cuda_hashing.dir\rule
 
-.PHONY : hello_cuda
+.PHONY : cuda_hashing
 
 # clean rule for target.
-CMakeFiles\hello_cuda.dir\clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\hello_cuda.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\hello_cuda.dir\clean
-.PHONY : CMakeFiles\hello_cuda.dir\clean
+CMakeFiles\cuda_hashing.dir\clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\cuda_hashing.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\cuda_hashing.dir\clean
+.PHONY : CMakeFiles\cuda_hashing.dir\clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

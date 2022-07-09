@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CUDA
-  "C:/Users/shford/CLionProjects/cuda_hashing/cuda_scoping.cu" "C:/Users/shford/CLionProjects/cuda_hashing/cmake-build-debug/CMakeFiles/hello_cuda.dir/cuda_scoping.cu.obj"
+  "C:/Users/shford/CLionProjects/cuda_hashing/cuda_scoping.cu" "C:/Users/shford/CLionProjects/cuda_hashing/cmake-build-debug/CMakeFiles/cuda_hashing.dir/cuda_scoping.cu.obj"
   )
 set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
 

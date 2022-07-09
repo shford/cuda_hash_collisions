@@ -1,0 +1,2 @@
+#pragma code_page(65001)
+1 /* CREATEPROCESS_MANIFEST_RESOURCE_ID */ 24 /* RT_MANIFEST */ "C:/Users/shford/CLionProjects/cuda_hashing/cmake-build-debug/CMakeFiles/cuda_hashing.dir/embed.manifest"

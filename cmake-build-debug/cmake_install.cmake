@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/shford/CLionProjects/hello_cuda
+# Install script for directory: C:/Users/shford/CLionProjects/cuda_hashing
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/shford/CLionProjects/hello_cuda/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/shford/CLionProjects/cuda_hashing/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
