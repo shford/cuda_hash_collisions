@@ -3,7 +3,7 @@
  * Github:  @shford
  *
  * Description:
- *  Flag framework to safely transfer data and synchronize device
+ *  Flag framework to safely transfer data and synchronize device.
  *
  */
 
@@ -11,7 +11,7 @@
 #include <cuda.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fileapi.h>
+//#include <fileapi.h>
 
 
 #define TARGET_COLLISIONS (5)
