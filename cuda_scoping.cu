@@ -7,8 +7,6 @@
  *
  */
 
-#include <cuda_runtime_api.h>
-#include <cuda.h>
 #include <stdio.h>
 #include <stdlib.h>
 //#include <fileapi.h>
@@ -24,15 +22,15 @@ __device__ bool terminate_signal;
 
 __global__ void kernel()
 {
+    // initialize local data
+    char* local_data;
+    cudaMalloc(&local_data, ARBITRARY_MAX_DATA_SIZE);
+
+    // copy global data to local
+    cudaMemcpyAsync(local_data, (const void*)collision, ARBITRARY_MAX_DATA_SIZE, cudaMemcpyDeviceToDevice, 0);
+
     while (terminate_signal == false)
     {
-        // initialize local data
-        char* local_data;
-        cudaMalloc(&local_data, ARBITRARY_MAX_DATA_SIZE);
-
-        // copy global data to local
-        cudaMemcpyAsync(local_data, (const void*)collision, ARBITRARY_MAX_DATA_SIZE, cudaMemcpyDeviceToDevice, 0);
-
         // replace this with working code
         bool hashes_match = true;
         if (hashes_match == true)
