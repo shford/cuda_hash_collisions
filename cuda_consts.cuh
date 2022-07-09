@@ -2,8 +2,8 @@
  * Constants for the RTX 3060-Ti obtained from Device Query (sample program)
  */
 
-#ifndef HELLO_CUDA_CUDA_CONSTS_CUH
-#define HELLO_CUDA_CUDA_CONSTS_CUH
+#ifndef CUDA_HASHING_CUDA_CONSTS_CUH
+#define CUDA_HASHING_CUDA_CONSTS_CUH
 
 #define global_memory_Mb 8192
 #define multiprocessors 38
@@ -38,4 +38,4 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
     }
 }
 
-#endif //HELLO_CUDA_CUDA_CONSTS_CUH
+#endif //CUDA_HASHING_CUDA_CONSTS_CUH
