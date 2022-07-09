@@ -20,11 +20,15 @@
 #include "subroutines.h"
 #include "WjCryptLib_Md5.h"
 
-#define CUDA_API_PER_THREAD_DEFAULT_STREAM per-thread
+#define CUDA_API_PER_THREAD_DEFAULT_STREAM
 #include <cuda_runtime_api.h>
 #include <cuda.h>
 #include "cuda_consts.cuh"
 
+/*
+ * todo
+ * set shared memory capacity to 0 - cudaFuncSetAttribute(kernel_name, cudaFuncAttributePreferredSharedMemoryCarveout, 0);
+ */
 
 // group initial non-parallel tasks for neatness
 __host__ int initial_sequential_tasks(char** sample_file_buff, long* sample_buff_size, MD5_HASH* md5_digest)
