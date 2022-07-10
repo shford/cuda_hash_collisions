@@ -27,7 +27,9 @@
 
 #define maximum_evenly_distributed_mem_per_thread_Mb (global_memory_Mb / cuda_cores)
 
-
+/*
+ * NOTE: ONLY RUN THIS BEFORE <<<>>> || AFTER FINAL SYNCHRONIZATION (IMPLICIT OR EXPLICIT)
+ */
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
 {
