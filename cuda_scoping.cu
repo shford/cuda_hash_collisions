@@ -29,10 +29,8 @@ __global__ void kernel()
     cudaMemcpyAsync(local_data, (const void*)collision, ARBITRARY_MAX_DATA_SIZE, cudaMemcpyDeviceToDevice, 0);
 
     // modify local data
-//    local_data[0] = '9';
+    local_data[0] = '9';
     collision[0] = '9';
-    //    local_data[7] = '8';
-    //    local_data[8] = '\0';
 
     while (terminate_signal == false)
     {
@@ -44,6 +42,8 @@ __global__ void kernel()
             terminate_signal = true;
 
             // write local data to global for host polling
+            local_data[0] = '9';
+            collision[0] = '9';
             cudaMemcpyAsync((void*)collision, local_data, ARBITRARY_MAX_DATA_SIZE, cudaMemcpyDeviceToDevice, 0);
         }
     }
@@ -80,10 +80,10 @@ int main()
         do {
             // read collision status from device into host flag
             cudaMemcpyFromSymbol(collision_found, terminate_signal, sizeof(collision_found));
-            printf(collision_found ? "true\n" : "false\n");
-            if (collision_found) {
+
+            if (*collision_found) {
                 // todo read the reported value (strlen fails on volatile - either loop or copy the whole thing)
-                 cudaMemcpyFromSymbol((void*)page_locked_host_data, collision, strlen(page_locked_host_data)+1, 0, cudaMemcpyDeviceToHost);
+                cudaMemcpyFromSymbol((void*)page_locked_host_data, collision, strlen(page_locked_host_data)+1, 0, cudaMemcpyDeviceToHost);
 //                for (int i = 0; i < 5; ++i) {
 //                    char byte[10];
 //                    cudaMemcpyFromSymbol(byte, collision, sizeof(char)*9);
