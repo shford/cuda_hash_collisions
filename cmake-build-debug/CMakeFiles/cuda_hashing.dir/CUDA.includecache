@@ -6,7 +6,11 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/shford/CLionProjects/cuda_hashing/scratch.cu
+C:/Users/shford/CLionProjects/cuda_hashing/cuda_scoping.cu
 stdio.h
+-
+stdlib.h
+-
+string.h
 -
 
