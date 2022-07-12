@@ -6,12 +6,17 @@
 #ifndef CUDA_HASHING_CUDA_CONSTS_CUH
 #define CUDA_HASHING_CUDA_CONSTS_CUH
 
-#include <cuda_runtime_api.h>
+#include <stdio.h>
 
-#define global_memory_Mb 8192
-#define multiprocessors 38
-#define cuda_cores 4864
-#define cuda_cores_per_multiprocessor 128
+
+//===========================================================================================================
+// DEVICE DATA (from DeviceQuery.exe)
+//===========================================================================================================
+#define GLOBAL_MEMORY_MB 8192
+#define CUDA_CORES 4864
+#define MAX_MEM_PER_ACTIVE_THREAD_MB (GLOBAL_MEMORY_MB / CUDA_CORES)
+#define MULTIPROCESSORS 38
+#define CUDA_CORES_PER_MULTIPROCESSOR 128
 #define memory_bus_width 256
 #define L2_Cache_Size 3145728
 #define maximum_texture_dimension_size_1D 131072
@@ -28,11 +33,18 @@
 #define max_dimension_size_of_a_thread_block (1024, 1024, 64)
 #define max_dimension_size_of_a_grid_size (2147483647, 65535, 65535)
 
-#define maximum_evenly_distributed_mem_per_thread_Mb (global_memory_Mb / cuda_cores)
+//===========================================================================================================
+// USER DEFINED CONSTANTS
+//===========================================================================================================
+#define TARGET_COLLISIONS (5)
+#define ARBITRARY_MAX_BUFF_SIZE (1024)
+#define FALSE (0)
+#define TRUE (1)
 
-/*
- * NOTE: ONLY RUN THIS BEFORE <<<>>> || AFTER FINAL SYNCHRONIZATION (IMPLICIT OR EXPLICIT)
- */
+//===========================================================================================================
+// CUDA ERROR CATCHING MACRO
+// NOTE: ONLY RUN THIS BEFORE <<<>>> || AFTER FINAL SYNCHRONIZATION (IMPLICIT OR EXPLICIT)
+//===========================================================================================================
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
 {
