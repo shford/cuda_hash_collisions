@@ -14,9 +14,10 @@
 //===========================================================================================================
 #define GLOBAL_MEMORY_MB 8192
 #define CUDA_CORES 4864
-#define MAX_MEM_PER_ACTIVE_THREAD_MB (GLOBAL_MEMORY_MB / CUDA_CORES)
 #define MULTIPROCESSORS 38
 #define CUDA_CORES_PER_MULTIPROCESSOR 128
+#define MAX_MEM_PER_ACTIVE_THREAD (GLOBAL_MEMORY_MB*1024*1024 / CUDA_CORES)
+
 #define memory_bus_width 256
 #define L2_Cache_Size 3145728
 #define maximum_texture_dimension_size_1D 131072
@@ -37,7 +38,10 @@
 // USER DEFINED CONSTANTS
 //===========================================================================================================
 #define TARGET_COLLISIONS (5)
-#define ARBITRARY_MAX_BUFF_SIZE (1024)
+#define ARBITRARY_MAX_BUFF_SIZE (600)
+#define NUM_8BIT_RANDS (48)
+#define NUM_32BIT_RANDS (NUM_8BIT_RANDS / 4)
+#define ENCODING_SIZE (256)
 #define FALSE (0)
 #define TRUE (1)
 
