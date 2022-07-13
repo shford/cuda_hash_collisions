@@ -111,11 +111,9 @@ __global__ void find_collisions(char* collision) {
                 // release synchronization barrier/mutex once host has reading and resets flag
             }
         }
-
         // increment hash attempts
         ++d_hash_attempts;
     } while(d_collisions_found < TARGET_COLLISIONS);
-
 }
 
 void task1() {

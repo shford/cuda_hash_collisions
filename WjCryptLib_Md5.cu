@@ -45,7 +45,7 @@
 //  This processes one or more 64-byte data blocks, but does NOT update the bit counters. There are no alignment
 //  requirements.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static
+__device__ __host__ static
 void*
 TransformFunction
         (
@@ -185,7 +185,7 @@ TransformFunction
 //
 //  Initialises an MD5 Context. Use this to initialise/reset a context.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void
+__device__ __host__ void
 Md5Initialise
         (
                 Md5Context*         Context         // [out]
@@ -206,7 +206,7 @@ Md5Initialise
 //  Adds data to the MD5 context. This will process the data and update the internal state of the context. Keep on
 //  calling this function until all the data has been added. Then call Md5Finalise to calculate the hash.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void
+__device__ __host__ void
 Md5Update
         (
                 Md5Context*         Context,        // [in out]
@@ -258,7 +258,7 @@ Md5Update
 //  Performs the final calculation of the hash and returns the digest (16 byte buffer containing 128bit hash). After
 //  calling this, Md5Initialised must be used to reuse the context.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void
+__device__ __host__ void
 Md5Finalise
         (
                 Md5Context*         Context,        // [in out]
@@ -320,7 +320,7 @@ Md5Finalise
 //
 //  Combines Md5Initialise, Md5Update, and Md5Finalise into one function. Calculates the MD5 hash of the buffer.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void
+__device__ __host__ void
 Md5Calculate
         (
                 void  const*        Buffer,         // [in]
