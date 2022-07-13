@@ -151,66 +151,69 @@ void task1() {
     // BEGIN CUDA PARALLELIZATION
     //===========================================================================================================
 
-    // allocate storage for collisions once found - overflows are simply truncated & result in another kernel run
+    // allocate storage for collisions once found
     char* h_collisions[TARGET_COLLISIONS];
     unsigned long long h_collision_sizes[TARGET_COLLISIONS];
-    unsigned long long h_unsafe_collision_attempts[TARGET_COLLISIONS];
+    unsigned long long h_collision_attempts = 0;
     for (int i = 0; i < TARGET_COLLISIONS; ++i) {
         h_collisions[i] = (char*)calloc(1, ARBITRARY_MAX_BUFF_SIZE);
         h_collision_sizes[i] = 0;
-        h_unsafe_collision_attempts[i] = 0;
     }
+    uint8_t h_num_collisions_found = 0;
+    int h_collision_flag = FALSE;
 
     // allocate global mem for collision - initialized in loop
     char* d_collision;
     gpuErrchk( cudaMalloc((void **)&d_collision, ARBITRARY_MAX_BUFF_SIZE) );
 
-    // hash until 5 hashes are found
-    int collision_count = 0;
-    while (collision_count != TARGET_COLLISIONS)
+    // parallelization setup
+    gpuErrchk( cudaMemcpyToSymbol(d_collisions_found, &h_num_collisions_found, sizeof(h_num_collisions_found), 0, cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpyToSymbol(d_collision_flag, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpyToSymbol(d_const_md5_digest, &md5_digest, sizeof(md5_digest), 0, cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpyToSymbol(d_collision_size, &h_sampleFile_buff_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpy(d_collision, h_sampleFile_buff, h_sampleFile_buff_size, cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpyToSymbol(d_unsafe_hash_attempts, &h_collision_attempts, sizeof(h_collision_attempts), 0, cudaMemcpyHostToDevice) );
+
+    // run kernel
+    while (cudaMemcpyFromSymbol(&h_num_collisions_found, d_collisions_found, sizeof(h_num_collisions_found), 0, cudaMemcpyDeviceToHost) == cudaSuccess && h_num_collisions_found < TARGET_COLLISIONS)
     {
-        // reset host variables corresponding that get read into
-        int h_collision_flag = FALSE;
-
-        // reset global device variables after each run
-        cudaMemcpyToSymbol(d_collision_flag, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice);
-        cudaMemcpyToSymbol(d_unsafe_hash_attempts, &h_unsafe_collision_attempts[collision_count], sizeof(h_unsafe_collision_attempts[collision_count]), 0, cudaMemcpyHostToDevice);
-        cudaMemcpyToSymbol(d_const_md5_digest, &md5_digest, sizeof(md5_digest), 0, cudaMemcpyHostToDevice);
-        cudaMemcpyToSymbol(d_collision_size, &h_sampleFile_buff_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyHostToDevice);
-        cudaMemcpy(d_collision, h_sampleFile_buff, h_sampleFile_buff_size, cudaMemcpyHostToDevice);
-
         // execution configuration (sync device)
         find_collisions<<<MULTIPROCESSORS, CUDA_CORES_PER_MULTIPROCESSOR>>>(d_collision);
 
-        //todo update rw's b/w new globals & symbols. then fill in kernel and happy debugging
+        // todo fill in kernel and happy debugging
         // poll collision flag
-        while (!h_collision_flag || collision_count != TARGET_COLLISIONS)
+        while (!h_collision_flag || h_num_collisions_found != TARGET_COLLISIONS)
         {
             // read collision status from device into host flag
             gpuErrchk( cudaMemcpyFromSymbol(&h_collision_flag, d_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyDeviceToHost) );
-            printf("h_collision_flag = %s after read.\n", h_collision_flag ? "TRUE" : "FALSE");
 
             if (h_collision_flag)
             {
-                // read updated collision count, collision size, and collision
-                gpuErrchk(cudaMemcpyFromSymbol(&h_unsafe_collision_attempts[collision_count], h_unsafe_collision_attempts,
-                                               sizeof(h_unsafe_collision_attempts), 0, cudaMemcpyDeviceToHost) );
-                gpuErrchk(cudaMemcpyFromSymbol(&h_collision_sizes[collision_count], d_collision_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyDeviceToHost) );
-                gpuErrchk( cudaMemcpy(h_collisions[collision_count], d_collision, h_sampleFile_buff_size, cudaMemcpyDeviceToHost) );
+                // read updated collision count, collision size, collision, and hash attempts
+                gpuErrchk(cudaMemcpyFromSymbol(&h_num_collisions_found, d_collisions_found, sizeof(h_num_collisions_found), 0, cudaMemcpyDeviceToHost) );
+                gpuErrchk(cudaMemcpyFromSymbol(&h_collision_sizes[h_num_collisions_found], d_collision_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyDeviceToHost) );
+                gpuErrchk(cudaMemcpy(h_collisions[h_num_collisions_found], d_collision, h_sampleFile_buff_size, cudaMemcpyDeviceToHost) );
+                gpuErrchk(cudaMemcpyFromSymbol(&h_collision_attempts, h_collision_attempts,
+                                               sizeof(h_collision_attempts), 0, cudaMemcpyDeviceToHost) );
 
-                // tell gpu threads to exit when they next read d_terminate_kernel
-                //gpuErrchk( cudaMemcpyToSymbol(d_terminate_kernel, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice) );
+                // reset flag to continue
+                h_collision_flag = FALSE;
+                cudaMemcpyToSymbol(d_collision_flag, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice);
 
-                // increase collision count
-                ++collision_count;
-
-                // ensure kernel processes are finished
-                gpuErrchk( cudaDeviceSynchronize() );
             }
         }
     }
+    gpuErrchk( cudaDeviceSynchronize() );
 
-    printf("\nSuccess... /\n");
+    // error handling
+    if (h_num_collisions_found < TARGET_COLLISIONS)
+    {
+        printf("Error: Failed to update the number of collisions from h_num_collisions_found.\n");
+    }
+    else
+    {
+        printf("\nCalculated %d collisions... Success/\n", TARGET_COLLISIONS);
+    }
 
     // free collisions
     cudaFreeHost(h_sampleFile_buff);
