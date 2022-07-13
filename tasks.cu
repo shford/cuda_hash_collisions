@@ -4,10 +4,10 @@
 
 
 __constant__ __device__ MD5_HASH d_const_md5_digest;    // store digest on L2 or L1 cache (on v8.6)
+__device__ uint8_t d_collisions_found;                  // track number of collisions found by active kernel
 __device__ unsigned long long d_collision_size;         // track # of characters in collision
 __device__ int d_collision_flag;                        // signal host to read
-__device__ unsigned long long d_unsafe_hash_attempts;   // track total number of attempts per collision
-__device__ uint8_t d_collisions_found;                  // track number of collisions found by active kernel
+__device__ unsigned long long d_hash_attempts;          // track total number of attempts per collision
 
 
 __global__ void find_collisions(char* collision) {
@@ -35,7 +35,7 @@ __global__ void find_collisions(char* collision) {
     //===========================================================================================================
     do
     {
-        ++d_unsafe_hash_attempts;
+        ++d_hash_attempts;
 
         // generate a new batch of random numbers as needed
         if (random_index == NUM_8BIT_RANDS) {
@@ -172,7 +172,7 @@ void task1() {
     gpuErrchk( cudaMemcpyToSymbol(d_const_md5_digest, &md5_digest, sizeof(md5_digest), 0, cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpyToSymbol(d_collision_size, &h_sampleFile_buff_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpy(d_collision, h_sampleFile_buff, h_sampleFile_buff_size, cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpyToSymbol(d_unsafe_hash_attempts, &h_collision_attempts, sizeof(h_collision_attempts), 0, cudaMemcpyHostToDevice) );
+    gpuErrchk( cudaMemcpyToSymbol(d_hash_attempts, &h_collision_attempts, sizeof(h_collision_attempts), 0, cudaMemcpyHostToDevice) );
 
     // run kernel
     while (cudaMemcpyFromSymbol(&h_num_collisions_found, d_collisions_found, sizeof(h_num_collisions_found), 0, cudaMemcpyDeviceToHost) == cudaSuccess && h_num_collisions_found < TARGET_COLLISIONS)
@@ -180,9 +180,8 @@ void task1() {
         // execution configuration (sync device)
         find_collisions<<<MULTIPROCESSORS, CUDA_CORES_PER_MULTIPROCESSOR>>>(d_collision);
 
-        // todo fill in kernel and happy debugging
         // poll collision flag
-        while (!h_collision_flag || h_num_collisions_found != TARGET_COLLISIONS)
+        while (!h_collision_flag)
         {
             // read collision status from device into host flag
             gpuErrchk( cudaMemcpyFromSymbol(&h_collision_flag, d_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyDeviceToHost) );
