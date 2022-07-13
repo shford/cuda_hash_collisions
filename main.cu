@@ -27,6 +27,8 @@
  *  Multi-Thread/Multi-Process - Initial & Final File I/O
  *  Multi-Thread/Multi-Process - Task 2
  *  Replace calloc inside read_file() w/ cudaMallocHost() to pin memory
+ *  Replace size w/ strlen calls in host b/c no need to transfer that
+ *  In kernel change from byte-by-byte copying to memcpyasync or at least by multiples of largest primitive
  */
 
 
