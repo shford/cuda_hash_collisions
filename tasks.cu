@@ -14,6 +14,7 @@ __global__ void find_collisions(char* collision) {
     //===========================================================================================================
     // DECLARATIONS & INITIALIZATION
     //===========================================================================================================
+
     // allocate local buffer and keep track of size in case of resizing
     char* local_collision;
     unsigned long long local_collision_size = d_collision_size;
@@ -33,10 +34,9 @@ __global__ void find_collisions(char* collision) {
     //===========================================================================================================
     // COMPUTATIONS - GENERATE RANDS, RESIZE BUFFER, APPEND CHAR, HASH, COMPARE { EXIT }
     //===========================================================================================================
+
     do
     {
-        ++d_hash_attempts;
-
         // generate a new batch of random numbers as needed
         if (random_index == NUM_8BIT_RANDS) {
             random_index = 0;
@@ -85,10 +85,11 @@ __global__ void find_collisions(char* collision) {
              *  1 thread sets a mutex causing a divergent instruction path and the
              *  scheduler interrupts said thread to schedule another which will then idle
              *  forever, thus preventing the mutex thread from completing.
-             *  May want to utilize capability: " Run time limit on kernels:                     Yes"
+             *  1) May want to utilize capability: " Run time limit on kernels:                     Yes"
+             *  2) May want to init 1 __shared var / block w/ thread id of whose turn is next
              */
 
-            // wait for resources to be released before waiting
+            // wait for resources to be released
             while (d_collision_flag) {
                 // idle
             }
@@ -96,10 +97,12 @@ __global__ void find_collisions(char* collision) {
             // set synchronization barrier/mutex on d_collision_flag, d_collision_size, collision
 
 
-            // write local_data, local_data_size to global for host polling
+            // for host polling: write local_data, local_data_size & increment d_collisions_found
             for (int byte_index = 0; byte_index <= local_collision_size; ++byte_index) {
                 collision[byte_index] = local_collision[byte_index];
             }
+            d_collision_size = local_collision_size;
+            ++d_collisions_found;
 
             // tell host to read collision
             d_collision_flag = TRUE;
@@ -108,6 +111,9 @@ __global__ void find_collisions(char* collision) {
                 // release synchronization barrier/mutex once host has reading and resets flag
             }
         }
+
+        // increment hash attempts
+        ++d_hash_attempts;
     } while(d_collisions_found < TARGET_COLLISIONS);
 
 }
@@ -192,13 +198,14 @@ void task1() {
                 gpuErrchk(cudaMemcpyFromSymbol(&h_num_collisions_found, d_collisions_found, sizeof(h_num_collisions_found), 0, cudaMemcpyDeviceToHost) );
                 gpuErrchk(cudaMemcpyFromSymbol(&h_collision_sizes[h_num_collisions_found], d_collision_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyDeviceToHost) );
                 gpuErrchk(cudaMemcpy(h_collisions[h_num_collisions_found], d_collision, h_sampleFile_buff_size, cudaMemcpyDeviceToHost) );
-                gpuErrchk(cudaMemcpyFromSymbol(&h_collision_attempts, h_collision_attempts,
-                                               sizeof(h_collision_attempts), 0, cudaMemcpyDeviceToHost) );
+                if (h_num_collisions_found == TARGET_COLLISIONS) {
+                    gpuErrchk(cudaMemcpyFromSymbol(&h_collision_attempts, h_collision_attempts,
+                                                   sizeof(h_collision_attempts), 0, cudaMemcpyDeviceToHost) );
+                }
 
                 // reset flag to continue
                 h_collision_flag = FALSE;
                 cudaMemcpyToSymbol(d_collision_flag, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice);
-
             }
         }
     }
