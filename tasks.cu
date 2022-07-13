@@ -114,6 +114,7 @@ __global__ void find_collisions(char* collision) {
         // increment hash attempts
         ++d_hash_attempts;
     } while(d_collisions_found < TARGET_COLLISIONS);
+    cudaFree(local_collision);
 }
 
 void task1() {
