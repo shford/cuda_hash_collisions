@@ -3,12 +3,114 @@
 #include "tasks.cuh"
 
 
-__constant__ __device__ MD5_HASH d_const_md5_digest; // initialized just once prior to kernel launches
-__device__ unsigned long long d_collision_size; // reset before every kernel launch
-__device__ int d_collision_flag;
-__device__ unsigned long long d_unsafe_hash_attempts;
+__constant__ __device__ MD5_HASH d_const_md5_digest;    // store digest on L2 or L1 cache (on v8.6)
+__device__ unsigned long long d_collision_size;         // track # of characters in collision
+__device__ int d_collision_flag;                        // signal host to read
+__device__ unsigned long long d_unsafe_hash_attempts;   // track total number of attempts per collision
+__device__ uint8_t d_collisions_found;                  // track number of collisions found by active kernel
 
-__global__ void find_collisions(char* global_collision_addr) {}
+
+__global__ void find_collisions(char* collision) {
+    //===========================================================================================================
+    // DECLARATIONS & INITIALIZATION
+    //===========================================================================================================
+    // allocate local buffer and keep track of size in case of resizing
+    char* local_collision;
+    unsigned long long local_collision_size = d_collision_size;
+    unsigned long long local_buff_size = ARBITRARY_MAX_BUFF_SIZE;
+    cudaMalloc(&local_collision, local_buff_size);
+    for (int byte_index = 0; byte_index <= local_collision_size; ++byte_index) {
+        local_collision[byte_index] = collision[byte_index];
+    }
+
+    // allocate room for new hash
+    MD5_HASH local_md5_digest;
+
+    // allocate storage for random character
+    unsigned long long random_index = 0;
+    uint8_t randoms[NUM_8BIT_RANDS];
+
+    //===========================================================================================================
+    // COMPUTATIONS - GENERATE RANDS, RESIZE BUFFER, APPEND CHAR, HASH, COMPARE { EXIT }
+    //===========================================================================================================
+    do
+    {
+        ++d_unsafe_hash_attempts;
+
+        // generate a new batch of random numbers as needed
+        if (random_index == NUM_8BIT_RANDS) {
+            random_index = 0;
+            for (int i = 0; i < NUM_32BIT_RANDS; ++i) {
+                int id = threadIdx.x + blockIdx.x * blockDim.x;
+                curandStatePhilox4_32_10_t state;
+                curand_init(i, id, 0, &state);
+                // assign 4 bytes at a time
+                randoms[i*4] = curand(&state);
+            }
+        }
+        ++random_index;
+
+        // resize local_collision
+        if (local_collision_size == ARBITRARY_MAX_BUFF_SIZE) {
+            // retain ptr to old buffer
+            char* old_buff = local_collision;
+
+            // reassign local_collision ptr to new buffer
+            local_buff_size *= 2;
+            cudaMalloc(&local_collision, local_buff_size);
+
+            // copy data from old buffer to new buffer
+            for (int i = 0; i < ARBITRARY_MAX_BUFF_SIZE; ++i) {
+                local_collision[i] = old_buff[i];
+            }
+
+            // free original buffer
+            cudaFree(old_buff);
+        }
+
+        // append random char
+        uint8_t character = randoms[random_index];
+        local_collision[local_collision_size - 1] = character ? character : 1; // no premature null terminators
+        local_collision[local_collision_size] = '\0';
+        ++local_collision_size;
+
+        // generate new hash
+        Md5Calculate((const void*)local_collision, local_collision_size, &local_md5_digest);
+
+        // terminate all threads if first 20 bits of digest match
+        if ( ((uint32_t)*d_const_md5_digest.bytes >> 12) == ((uint32_t)*local_md5_digest.bytes >> 12))
+        {
+            /* todo:
+             *  unlikely but possible device wide deadlock if within the same warp
+             *  1 thread sets a mutex causing a divergent instruction path and the
+             *  scheduler interrupts said thread to schedule another which will then idle
+             *  forever, thus preventing the mutex thread from completing.
+             *  May want to utilize capability: " Run time limit on kernels:                     Yes"
+             */
+
+            // wait for resources to be released before waiting
+            while (d_collision_flag) {
+                // idle
+            }
+
+            // set synchronization barrier/mutex on d_collision_flag, d_collision_size, collision
+
+
+            // write local_data, local_data_size to global for host polling
+            for (int byte_index = 0; byte_index <= local_collision_size; ++byte_index) {
+                collision[byte_index] = local_collision[byte_index];
+            }
+
+            // tell host to read collision
+            d_collision_flag = TRUE;
+
+            while (d_collision_flag) {
+                // release synchronization barrier/mutex once host has reading and resets flag
+            }
+        }
+    } while(d_collisions_found < TARGET_COLLISIONS);
+
+}
 
 void task1() {
     //===========================================================================================================
@@ -71,10 +173,10 @@ void task1() {
         int h_collision_flag = FALSE;
 
         // reset global device variables after each run
-        cudaMemcpyToSymbol(d_const_md5_digest, &md5_digest, sizeof(md5_digest), 0, cudaMemcpyHostToDevice);
-        cudaMemcpyToSymbol(d_collision_size, &h_sampleFile_buff_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyHostToDevice);
         cudaMemcpyToSymbol(d_collision_flag, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice);
         cudaMemcpyToSymbol(d_unsafe_hash_attempts, &h_unsafe_collision_attempts[collision_count], sizeof(h_unsafe_collision_attempts[collision_count]), 0, cudaMemcpyHostToDevice);
+        cudaMemcpyToSymbol(d_const_md5_digest, &md5_digest, sizeof(md5_digest), 0, cudaMemcpyHostToDevice);
+        cudaMemcpyToSymbol(d_collision_size, &h_sampleFile_buff_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyHostToDevice);
         cudaMemcpy(d_collision, h_sampleFile_buff, h_sampleFile_buff_size, cudaMemcpyHostToDevice);
 
         // execution configuration (sync device)
@@ -90,26 +192,20 @@ void task1() {
 
             if (h_collision_flag)
             {
-                // read updated collision size into h_page_locked_data size
+                // read updated collision count, collision size, and collision
+                gpuErrchk(cudaMemcpyFromSymbol(&h_unsafe_collision_attempts[collision_count], h_unsafe_collision_attempts,
+                                               sizeof(h_unsafe_collision_attempts), 0, cudaMemcpyDeviceToHost) );
                 gpuErrchk(cudaMemcpyFromSymbol(&h_collision_sizes[collision_count], d_collision_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyDeviceToHost) );
-
-                // read from collision to host mem
                 gpuErrchk( cudaMemcpy(h_collisions[collision_count], d_collision, h_sampleFile_buff_size, cudaMemcpyDeviceToHost) );
 
                 // tell gpu threads to exit when they next read d_terminate_kernel
-//                gpuErrchk( cudaMemcpyToSymbol(d_terminate_kernel, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice) );
+                //gpuErrchk( cudaMemcpyToSymbol(d_terminate_kernel, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice) );
 
-                // replace condition with hash check
-                if (true) // todo replace true w/ 20 bit comparisons
-                {
-                    // write file (note this should be multi-threaded. this is a waste of time when the gpu is likely idling)
+                // increase collision count
+                ++collision_count;
 
-                    // increase collision count
-                    ++collision_count;
-
-                    // ensure kernel processes are finished
-                    gpuErrchk( cudaDeviceSynchronize() );
-                }
+                // ensure kernel processes are finished
+                gpuErrchk( cudaDeviceSynchronize() );
             }
         }
     }

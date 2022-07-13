@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <cuda.h>
+#include <cuda_runtime_api.h>
+#include <curand_kernel.h>
 #include "cuda_consts.cuh"
 #include "kernels.cuh"
 #include "subroutines.cuh"
