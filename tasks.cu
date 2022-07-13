@@ -2,14 +2,15 @@
 
 #include "tasks.cuh"
 
+// statically initialized global variables
+__device__ uint8_t d_collisions_found = 0;              // track number of collisions found by active kernel
+__device__ unsigned long long d_hash_attempts = 0;      // track total number of attempts per collision
+__device__ int d_global_mutex = FALSE;                  // signal mutex to other threads (globally)
+__device__ int d_collision_flag = FALSE;                // signal host to read
 
+// dynamically initialized in host
 __constant__ __device__ MD5_HASH d_const_md5_digest;    // store digest on L2 or L1 cache (on v8.6)
-__device__ uint8_t d_collisions_found;                  // track number of collisions found by active kernel
 __device__ unsigned long long d_collision_size;         // track # of characters in collision
-__device__ int d_collision_flag;                        // signal host to read
-__device__ unsigned long long d_hash_attempts;          // track total number of attempts per collision
-__device__ int d_global_mutex;                          // global mutex
-
 
 __global__ void find_collisions(char* collision) {
     //===========================================================================================================
@@ -178,20 +179,17 @@ void task1() {
     char* d_collision;
     gpuErrchk( cudaMalloc((void **)&d_collision, ARBITRARY_MAX_BUFF_SIZE) );
 
-    // parallelization setup
-    gpuErrchk( cudaMemcpyToSymbol(d_collisions_found, &h_num_collisions_found, sizeof(h_num_collisions_found), 0, cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpyToSymbol(d_collision_flag, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpyToSymbol(d_global_mutex, &h_collision_flag, sizeof(h_collision_flag), 0, cudaMemcpyHostToDevice) );
+    // parallelization setup - initialize device globals
     gpuErrchk( cudaMemcpyToSymbol(d_const_md5_digest, &md5_digest, sizeof(md5_digest), 0, cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpyToSymbol(d_collision_size, &h_sampleFile_buff_size, sizeof(h_sampleFile_buff_size), 0, cudaMemcpyHostToDevice) );
     gpuErrchk( cudaMemcpy(d_collision, h_sampleFile_buff, h_sampleFile_buff_size, cudaMemcpyHostToDevice) );
-    gpuErrchk( cudaMemcpyToSymbol(d_hash_attempts, &h_collision_attempts, sizeof(h_collision_attempts), 0, cudaMemcpyHostToDevice) );
 
     // run kernel
     while (cudaMemcpyFromSymbol(&h_num_collisions_found, d_collisions_found, sizeof(h_num_collisions_found), 0, cudaMemcpyDeviceToHost) == cudaSuccess && h_num_collisions_found < TARGET_COLLISIONS)
     {
         // execution configuration (sync device)
-        find_collisions<<<MULTIPROCESSORS-1, CUDA_CORES_PER_MULTIPROCESSOR>>>(d_collision);
+        find_collisions<<<1, 1>>>(d_collision);
+        //find_collisions<<<MULTIPROCESSORS-1, CUDA_CORES_PER_MULTIPROCESSOR>>>(d_collision);
 
         // poll collision flag
         while (!h_collision_flag)
